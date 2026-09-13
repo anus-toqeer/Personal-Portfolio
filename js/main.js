@@ -3,25 +3,30 @@
    Shared interactivity
    ===================================================== */
 
-/* ---------- 1. Responsive hamburger nav ---------- */
+/* ---------- 1. Responsive sidebar nav ---------- */
 function initNav() {
-  const toggle = document.querySelector('.hamburger');
-  const links = document.querySelector('.nav-links');
-  if (!toggle || !links) return;
+  const toggle = document.querySelector('.mobile-bar-toggle');
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.querySelector('.sidebar-overlay');
+  if (!toggle || !sidebar || !overlay) return;
+
+  function setOpen(isOpen) {
+    sidebar.classList.toggle('is-open', isOpen);
+    toggle.classList.toggle('is-open', isOpen);
+    overlay.classList.toggle('is-open', isOpen);
+    toggle.setAttribute('aria-expanded', String(isOpen));
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  }
 
   toggle.addEventListener('click', () => {
-    const isOpen = links.classList.toggle('is-open');
-    toggle.classList.toggle('is-open', isOpen);
-    toggle.setAttribute('aria-expanded', String(isOpen));
+    setOpen(!sidebar.classList.contains('is-open'));
   });
 
-  // close menu when a link is picked (mobile)
-  links.querySelectorAll('a').forEach((a) => {
-    a.addEventListener('click', () => {
-      links.classList.remove('is-open');
-      toggle.classList.remove('is-open');
-      toggle.setAttribute('aria-expanded', 'false');
-    });
+  overlay.addEventListener('click', () => setOpen(false));
+
+  // close the drawer once a link is picked (mobile)
+  sidebar.querySelectorAll('.sidebar-link').forEach((a) => {
+    a.addEventListener('click', () => setOpen(false));
   });
 }
 
