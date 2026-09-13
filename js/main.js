@@ -198,14 +198,40 @@ function initContactForm() {
 
     status.classList.remove('is-success', 'is-error');
 
-    if (allValid) {
-      status.textContent = "Thanks — your message is ready to send. (This is a static demo form, so nothing is transmitted yet — wire it up to a form backend or email service to go live.)";
-      status.classList.add('is-success');
-      form.reset();
-    } else {
+    if (!allValid) {
       status.textContent = 'Please fix the highlighted fields and try again.';
       status.classList.add('is-error');
+      return;
     }
+
+    // send the validated data to Formspree (no backend code needed)
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+
+    fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: { Accept: 'application/json' },
+    })
+      .then((response) => {
+        if (response.ok) {
+          status.textContent = "Thanks — your message has been sent. I'll get back to you soon.";
+          status.classList.add('is-success');
+          form.reset();
+        } else {
+          status.textContent = 'Something went wrong sending your message — please email me directly instead.';
+          status.classList.add('is-error');
+        }
+      })
+      .catch(() => {
+        status.textContent = 'Network error — please check your connection and try again.';
+        status.classList.add('is-error');
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send message';
+      });
   });
 }
 
